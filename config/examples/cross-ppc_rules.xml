@@ -21,7 +21,7 @@ HOSTINCLUDES := -I$(SRCDIR)/include -I$(SRCDIR)/kernel -I$(SRCDIR)/kernel/includ
 #
 MOLPATH=$(HOME)/mol-0.9.71
 
-TARGET=powerpc-linux-gnu-
+TARGET=powerpc-unknown-linux-gnu-
 CC     := $(TARGET)gcc
 AS     := $(TARGET)as
 AR     := $(TARGET)ar
