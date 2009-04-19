@@ -45,6 +45,7 @@ volume_readinbuf(volume * vol,void* buf, long block)
 
 	blksize_bits = vol->blksize_bits;
 	block	+= vol->startblock;
+	os_set_offset(vol->offset * HFSP_BLOCKSZ);
 	if( os_seek(vol->os_fd, block, blksize_bits) == block)
 		if( 1 == os_read(vol->os_fd, buf, 1, blksize_bits))
 			return 0;
@@ -163,6 +164,25 @@ volume_read(volume * vol, hfsp_vh* vh, UInt32 block)
         return volume_readbuf(vh, buf);
 }
 
+static int
+volume_read_map(volume *vol)
+{
+	UInt16  signature;
+	char	buf[vol->blksize];
+	char    *p = buf;
+
+	if( volume_readinbuf(vol, buf, 2) ) // Wrapper or volume header starts here
+		return -1;
+
+	signature = bswabU16_inc(p);
+	if( signature == APPLE_MAP_SIG ) {
+		p = &buf[8];
+		vol->offset = bswabU32_inc(p);
+	}
+
+	return 0;
+}
+
 /* Find out wether the volume is wrapped and unwrap it eventually */
 static int
 volume_read_wrapper(volume * vol, hfsp_vh* vh)
@@ -201,7 +221,10 @@ volume_read_wrapper(volume * vol, hfsp_vh* vh)
 	}
 	else if( signature == HFSP_VOLHEAD_SIG) { /* Native HFS+ volume */
 		p = buf; // Restore to begin of block
-                return volume_readbuf(vh, p);
+		if( volume_readbuf(vh, p) )
+			return -1;
+		vol->maxblocks = (vh->total_blocks * vh->blocksize) / HFSP_BLOCKSZ;
+		return 0;
 	} else
 		 HFSP_ERROR(-1, "Neither Wrapper nor native HFS+ volume header found");
 fail:
@@ -218,10 +241,11 @@ volume_open( volume* vol, int os_fd )
 	long	sect_per_block;
 	int	shift;
 
+	vol->offset			= 0;
 	vol->blksize_bits	= HFSP_BLOCKSZ_BITS;
 	vol->blksize		= HFSP_BLOCKSZ;
 	vol->startblock		= 0;
-	vol->maxblocks		= 3;
+	vol->maxblocks		= 8;
 		/* this should be enough until we find the volume descriptor */
 	vol->extents		= NULL; /* Thanks to Jeremias Sauceda */
 
@@ -230,6 +254,8 @@ volume_open( volume* vol, int os_fd )
 
 	// vol->maxblocks = os_seek(vol->os_fd, -1, HFSP_BLOCKSZ_BITS);
 	// This wont work for /dev/... but we do not really need it
+
+	volume_read_map(vol);
 
 	if( volume_read_wrapper(vol, &vol->vol))
 		return -1;

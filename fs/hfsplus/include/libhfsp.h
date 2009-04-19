@@ -159,6 +159,7 @@ typedef struct volume
     UInt16	blksize_bits;   /* blocksize of device = 1 << blksize_bits */
     UInt16	filler;
     UInt32	blksize;	/* always 1 << blksize_bits */
+    UInt32	offset;
     UInt32	startblock;
 	/* Offset from physical to logical blocks,
 	   eventually intodruced by HFS wrapper */

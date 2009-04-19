@@ -30,6 +30,11 @@
 int os_same( int fd1, int fd2 );
 
 /*
+ * sets a constant offset to be used when using os_seek()
+ */
+void os_set_offset(unsigned long offset);
+
+/*
  * NAME:	os->seek()
  * DESCRIPTION:	set a descriptor's seek pointer (offset in blocks)
  */

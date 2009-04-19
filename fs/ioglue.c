@@ -22,8 +22,11 @@
 #include "hfs_mdb.h"
 
 /************************************************************************/
-/*	functionsions used by the various filesystems			*/
+/*	functions used by the various filesystems			*/
 /************************************************************************/
+
+// XXX: This is sloppy... Make the os_* functions have a private state structure.
+static ulong s_offset = 0;
 
 char *
 get_hfs_vol_name( int fd, char *buf, int size )
@@ -47,6 +50,12 @@ get_hfs_vol_name( int fd, char *buf, int size )
 	return buf;
 }
 
+void
+os_set_offset(ulong offset)
+{
+	s_offset = offset;
+}
+
 ulong
 os_read( int fd, void *buf, ulong len, int blksize_bits )
 {
@@ -60,7 +69,7 @@ ulong
 os_seek( int fd, ulong blknum, int blksize_bits )
 {
 	/* printk("os_seek %d\n", blknum ); */
-	llong offs = (llong)blknum << blksize_bits;
+	llong offs = ((llong)blknum << blksize_bits) + s_offset;
 
 	/* offset == -1 means seek to EOF */
 	if( (int)blknum == -1 )

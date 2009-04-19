@@ -30,7 +30,8 @@
 
 #define HFSP_BLOCKSZ            512	/* A sector for Apple is always 512 bytes */
 #define HFSP_BLOCKSZ_BITS       9	/* 1<<9 == 512  */
-#define	HFSP_VOLHEAD_SIG	0x482B	/* 'H+'	*/
+#define HFSP_VOLHEAD_SIG	0x482B	/* 'H+'	*/
+#define APPLE_MAP_SIG           0x504d  /* 'PM' */
 
 /* HFS+ includes POSIX permissions , although marked as reserved they will be
  * used as such. Is ignored by MacOS 8-9 but probably not by MacOS X.
