@@ -25,7 +25,7 @@
 
 #define BIT(n)		(1U<<(31-(n)))
 
-#define FREE_BASE		0x00004000
+#define FREE_BASE		0x05800000
 #define IO_BASE			0x80000000
 #define OFMEM			((ofmem_t*)FREE_BASE)
 #define OF_MALLOC_BASE		((char*)OFMEM + ((sizeof(ofmem_t) + 3) & ~3))
