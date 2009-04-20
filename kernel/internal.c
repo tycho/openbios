@@ -167,7 +167,7 @@ static void call(void)
 #else
 	void (*funcptr) (void);
 	funcptr=(void *)POP();
-	dbg_interp_printk("call: %x", funcptr);
+	dbg_interp_printk("call: %08lx", (ulong)funcptr);
 	funcptr();
 #endif
 }
